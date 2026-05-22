@@ -1,14 +1,28 @@
 import SwiftUI
 import Combine
 import UserNotifications
+import AVFoundation
 
 class SessionViewModel: ObservableObject {
+    
+    private var audioPlayer: AVAudioPlayer?
+    private var currentTrackMood: MoodType?
+
+    @Published var isAudioPlaying: Bool = false
+    @Published var audioVolume: Float = 0.8
+    @Published var currentTrackName: String = ""
+    @Published var audioDuration: TimeInterval = 0
+    @Published var audioCurrentTime: TimeInterval = 0
+
+    private var audioProgressTimer: Timer?
+
+    // MARK: - Session state
     @Published var sessions: [MusicSession] = []
     @Published var currentSession: MusicSession?
     @Published var focusTimerRemaining: TimeInterval = 0
     @Published var focusTimerTotal: TimeInterval = 25 * 60
     @Published var isTimerRunning: Bool = false
-    @Published var selectedDuration: TimeInterval = 25 * 60  // 25 min
+    @Published var selectedDuration: TimeInterval = 25 * 60
     @Published var selectedSoundType: String = "Lo-Fi"
     @Published var sleepTimerRemaining: TimeInterval = 0
     @Published var isSleepTimerActive: Bool = false
@@ -19,6 +33,107 @@ class SessionViewModel: ObservableObject {
 
     init() {
         loadSessions()
+        setupAudioSession()
+    }
+
+    // MARK: - Audio Session Setup
+    private func setupAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session setup error: \(error)")
+        }
+    }
+
+    // MARK: - Audio Playback
+    /// Returns filename for mood (without extension). File must be in app bundle.
+    private func trackName(for mood: MoodType) -> String {
+        switch mood {
+        case .focus:  return "focus"
+        case .chill:  return "chill"
+        case .energy: return "energy"
+        case .night:  return "night"
+        case .happy:  return "happy"
+        }
+    }
+
+    func playAudio(for mood: MoodType) {
+        let name = trackName(for: mood)
+
+        // If same track already playing — just resume
+        if currentTrackMood == mood, let player = audioPlayer {
+            if !player.isPlaying {
+                player.play()
+                isAudioPlaying = true
+                startProgressTimer()
+            }
+            return
+        }
+
+        // Load new track
+        guard let url = Bundle.main.url(forResource: name, withExtension: "mp3") else {
+            print("Audio file not found: \(name).mp3 — add it to the Xcode project target")
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.volume = audioVolume
+            audioPlayer?.numberOfLoops = -1 // loop infinitely
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            currentTrackMood = mood
+            isAudioPlaying = true
+            currentTrackName = name.capitalized
+            audioDuration = audioPlayer?.duration ?? 0
+            startProgressTimer()
+        } catch {
+            print("Audio playback error: \(error)")
+        }
+    }
+
+    func pauseAudio() {
+        audioPlayer?.pause()
+        isAudioPlaying = false
+        stopProgressTimer()
+    }
+
+    func stopAudio() {
+        audioPlayer?.stop()
+        audioPlayer = nil
+        isAudioPlaying = false
+        currentTrackMood = nil
+        currentTrackName = ""
+        audioCurrentTime = 0
+        audioDuration = 0
+        stopProgressTimer()
+    }
+
+    func setVolume(_ volume: Float) {
+        audioVolume = volume
+        audioPlayer?.volume = volume
+    }
+
+    func togglePlayPause(mood: MoodType) {
+        if isAudioPlaying {
+            pauseAudio()
+        } else {
+            playAudio(for: mood)
+        }
+    }
+
+    private func startProgressTimer() {
+        stopProgressTimer()
+        audioProgressTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            guard let self = self, let player = self.audioPlayer else { return }
+            self.audioCurrentTime = player.currentTime
+        }
+    }
+
+    private func stopProgressTimer() {
+        audioProgressTimer?.invalidate()
+        audioProgressTimer = nil
     }
 
     // MARK: - Focus Timer
@@ -26,6 +141,8 @@ class SessionViewModel: ObservableObject {
         focusTimerTotal = duration
         focusTimerRemaining = duration
         isTimerRunning = true
+
+        playAudio(for: mood)
 
         let session = MusicSession(
             mood: mood,
@@ -53,6 +170,7 @@ class SessionViewModel: ObservableObject {
     func stopFocus(completed: Bool, mood: MoodType, genre: GenreType) {
         timerCancellable?.cancel()
         isTimerRunning = false
+        stopAudio()
 
         let elapsed = focusTimerTotal - focusTimerRemaining
         if elapsed > 30 {
@@ -83,12 +201,14 @@ class SessionViewModel: ObservableObject {
             energyScore: Double.random(in: 30...70)
         )
         currentSession = session
+        playAudio(for: mood)
     }
 
     func stopSession() {
         guard let s = currentSession else { return }
         saveSession(s)
         currentSession = nil
+        stopAudio()
     }
 
     // MARK: - Sleep Timer
@@ -102,9 +222,15 @@ class SessionViewModel: ObservableObject {
                 guard let self = self else { return }
                 if self.sleepTimerRemaining > 0 {
                     self.sleepTimerRemaining -= 1
+                    // Fade out in last 10 seconds
+                    if self.sleepTimerRemaining <= 10 {
+                        let vol = Float(self.sleepTimerRemaining / 10) * self.audioVolume
+                        self.audioPlayer?.volume = vol
+                    }
                 } else {
                     self.isSleepTimerActive = false
                     self.sleepTimerCancellable?.cancel()
+                    self.stopAudio()
                 }
             }
     }
@@ -113,6 +239,7 @@ class SessionViewModel: ObservableObject {
         sleepTimerCancellable?.cancel()
         isSleepTimerActive = false
         sleepTimerRemaining = 0
+        audioPlayer?.volume = audioVolume // restore volume
     }
 
     // MARK: - Persistence

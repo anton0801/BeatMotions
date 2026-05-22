@@ -8,11 +8,41 @@
 
 /* Begin PBXBuildFile section */
 		8FB14BE32FBCC315005F595E /* codemagic.yaml in Resources */ = {isa = PBXBuildFile; fileRef = 8FB14BE22FBCC315005F595E /* codemagic.yaml */; };
+		8FD1E4792FBF9D10007F165A /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 8FD1E4782FBF9D10007F165A /* AppsFlyerLib */; };
+		8FD1E47C2FBF9D2C007F165A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8FD1E47B2FBF9D2C007F165A /* FirebaseCore */; };
+		8FD1E47E2FBF9D2C007F165A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8FD1E47D2FBF9D2C007F165A /* FirebaseMessaging */; };
+		8FD1E48A2FC053F1007F165A /* BeatPushService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 8FD1E4832FC053F1007F165A /* BeatPushService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		8FD1E4922FC05407007F165A /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 8FD1E4912FC05407007F165A /* FirebaseMessaging */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8FD1E4882FC053F1007F165A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8F8AA1922FB61FB90068AC4B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8FD1E4822FC053F1007F165A;
+			remoteInfo = BeatPushService;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8FD1E48F2FC053F1007F165A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				8FD1E48A2FC053F1007F165A /* BeatPushService.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		8F8AA19A2FB61FB90068AC4B /* BeatMotion.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeatMotion.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FB14BE22FBCC315005F595E /* codemagic.yaml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = codemagic.yaml; sourceTree = "<group>"; };
+		8FD1E4832FC053F1007F165A /* BeatPushService.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BeatPushService.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -22,6 +52,13 @@
 				Info.plist,
 			);
 			target = 8F8AA1992FB61FB90068AC4B /* BeatMotion */;
+		};
+		8FD1E48E2FC053F1007F165A /* Exceptions for "BeatPushService" folder in "BeatPushService" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 8FD1E4822FC053F1007F165A /* BeatPushService */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -34,6 +71,14 @@
 			path = BeatMotion;
 			sourceTree = "<group>";
 		};
+		8FD1E4842FC053F1007F165A /* BeatPushService */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				8FD1E48E2FC053F1007F165A /* Exceptions for "BeatPushService" folder in "BeatPushService" target */,
+			);
+			path = BeatPushService;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +86,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8FD1E47E2FBF9D2C007F165A /* FirebaseMessaging in Frameworks */,
+				8FD1E47C2FBF9D2C007F165A /* FirebaseCore in Frameworks */,
+				8FD1E4792FBF9D10007F165A /* AppsFlyerLib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8FD1E4802FC053F1007F165A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8FD1E4922FC05407007F165A /* FirebaseMessaging in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,6 +108,8 @@
 			children = (
 				8FB14BE22FBCC315005F595E /* codemagic.yaml */,
 				8F8AA19C2FB61FB90068AC4B /* BeatMotion */,
+				8FD1E4842FC053F1007F165A /* BeatPushService */,
+				8FD1E4902FC05407007F165A /* Frameworks */,
 				8F8AA19B2FB61FB90068AC4B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -60,8 +118,16 @@
 			isa = PBXGroup;
 			children = (
 				8F8AA19A2FB61FB90068AC4B /* BeatMotion.app */,
+				8FD1E4832FC053F1007F165A /* BeatPushService.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8FD1E4902FC05407007F165A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,20 +140,48 @@
 				8F8AA1962FB61FB90068AC4B /* Sources */,
 				8F8AA1972FB61FB90068AC4B /* Frameworks */,
 				8F8AA1982FB61FB90068AC4B /* Resources */,
+				8FD1E48F2FC053F1007F165A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				8FD1E4892FC053F1007F165A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				8F8AA19C2FB61FB90068AC4B /* BeatMotion */,
 			);
 			name = BeatMotion;
 			packageProductDependencies = (
+				8FD1E4782FBF9D10007F165A /* AppsFlyerLib */,
+				8FD1E47B2FBF9D2C007F165A /* FirebaseCore */,
+				8FD1E47D2FBF9D2C007F165A /* FirebaseMessaging */,
 			);
 			productName = BeatMotion;
 			productReference = 8F8AA19A2FB61FB90068AC4B /* BeatMotion.app */;
 			productType = "com.apple.product-type.application";
+		};
+		8FD1E4822FC053F1007F165A /* BeatPushService */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8FD1E48B2FC053F1007F165A /* Build configuration list for PBXNativeTarget "BeatPushService" */;
+			buildPhases = (
+				8FD1E47F2FC053F1007F165A /* Sources */,
+				8FD1E4802FC053F1007F165A /* Frameworks */,
+				8FD1E4812FC053F1007F165A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				8FD1E4842FC053F1007F165A /* BeatPushService */,
+			);
+			name = BeatPushService;
+			packageProductDependencies = (
+				8FD1E4912FC05407007F165A /* FirebaseMessaging */,
+			);
+			productName = BeatPushService;
+			productReference = 8FD1E4832FC053F1007F165A /* BeatPushService.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -102,6 +196,9 @@
 					8F8AA1992FB61FB90068AC4B = {
 						CreatedOnToolsVersion = 16.4;
 					};
+					8FD1E4822FC053F1007F165A = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = 8F8AA1952FB61FB90068AC4B /* Build configuration list for PBXProject "BeatMotion" */;
@@ -113,12 +210,17 @@
 			);
 			mainGroup = 8F8AA1912FB61FB90068AC4B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8FD1E4772FBF9D10007F165A /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
+				8FD1E47A2FBF9D2C007F165A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8F8AA19B2FB61FB90068AC4B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				8F8AA1992FB61FB90068AC4B /* BeatMotion */,
+				8FD1E4822FC053F1007F165A /* BeatPushService */,
 			);
 		};
 /* End PBXProject section */
@@ -132,6 +234,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8FD1E4812FC053F1007F165A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -142,7 +251,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		8FD1E47F2FC053F1007F165A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		8FD1E4892FC053F1007F165A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8FD1E4822FC053F1007F165A /* BeatPushService */;
+			targetProxy = 8FD1E4882FC053F1007F165A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		8F8AA1A42FB61FBB0068AC4B /* Debug */ = {
@@ -272,6 +396,7 @@
 				INFOPLIST_FILE = BeatMotion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Beat Motions";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Beat Motion request access to your camera.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Beat Motions uses tracking data to improve app performance, understand how users interact with features, enhance the overall experience, and support ongoing optimization and updates. This information also helps maintain stability, security, and reliable operation of the app.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -286,7 +411,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.motioninbeats.BeatMotion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -313,6 +438,7 @@
 				INFOPLIST_FILE = BeatMotion/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Beat Motions";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Beat Motion request access to your camera.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Beat Motions uses tracking data to improve app performance, understand how users interact with features, enhance the overall experience, and support ongoing optimization and updates. This information also helps maintain stability, security, and reliable operation of the app.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -327,7 +453,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.3;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.motioninbeats.BeatMotion;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -338,6 +464,67 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.5;
+			};
+			name = Release;
+		};
+		8FD1E48C2FC053F1007F165A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BeatPushService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BeatPushService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.motioninbeats.BeatMotion.BeatPushService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		8FD1E48D2FC053F1007F165A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BeatPushService/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BeatPushService;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.motioninbeats.BeatMotion.BeatPushService;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -362,7 +549,58 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		8FD1E48B2FC053F1007F165A /* Build configuration list for PBXNativeTarget "BeatPushService" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8FD1E48C2FC053F1007F165A /* Debug */,
+				8FD1E48D2FC053F1007F165A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8FD1E4772FBF9D10007F165A /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.18.0;
+			};
+		};
+		8FD1E47A2FBF9D2C007F165A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.13.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8FD1E4782FBF9D10007F165A /* AppsFlyerLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8FD1E4772FBF9D10007F165A /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */;
+			productName = AppsFlyerLib;
+		};
+		8FD1E47B2FBF9D2C007F165A /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8FD1E47A2FBF9D2C007F165A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		8FD1E47D2FBF9D2C007F165A /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8FD1E47A2FBF9D2C007F165A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		8FD1E4912FC05407007F165A /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8FD1E47A2FBF9D2C007F165A /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 8F8AA1922FB61FB90068AC4B /* Project object */;
 }

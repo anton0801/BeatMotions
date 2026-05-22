@@ -75,3 +75,113 @@ class StatsViewModel: ObservableObject {
         filteredStats.map { $0.minutesListened }
     }
 }
+
+@MainActor
+final class BeatMotionsViewModel: ObservableObject {
+
+    @Published var navigateToMain = false {
+        didSet {
+            if navigateToMain {
+                deadlineTask?.cancel()
+                uiLocked = true
+            }
+        }
+    }
+    
+    @Published var navigateToWeb = false {
+        didSet {
+            if navigateToWeb {
+                deadlineTask?.cancel()
+                uiLocked = true
+            }
+        }
+    }
+    
+    @Published var showPermissionPrompt = false
+    @Published var showOfflineView = false
+    
+    private let conductor: MotionConductor
+    private var cancellables = Set<AnyCancellable>()
+    private var deadlineTask: Task<Void, Never>?
+    
+    private var uiLocked: Bool = false
+    
+    init() {
+        self.conductor = MotionConductor()
+        wireUp()
+    }
+    
+    deinit {
+        deadlineTask?.cancel()
+    }
+    
+    private func wireUp() {
+        conductor.outcomePublisher
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] outcome in
+                self?.handleOutcome(outcome)
+            }
+            .store(in: &cancellables)
+    }
+    
+    func boot() {
+        conductor.warmUp()
+        armDeadline()
+    }
+    
+    func ingestAttribution(_ data: [String: Any]) {
+        Task {
+            conductor.ingestTempo(data)
+            await conductor.conduct()
+        }
+    }
+    
+    func ingestDeeplinks(_ data: [String: Any]) {
+        conductor.ingestCues(data)
+    }
+    
+    func acceptConsent() {
+        conductor.acceptConsent {
+            self.showPermissionPrompt = false
+        }
+    }
+    
+    func skipConsent() {
+        conductor.deferConsent()
+        showPermissionPrompt = false
+    }
+    
+    func networkConnectivityChanged(_ connected: Bool) {
+        showOfflineView = !connected
+    }
+    
+    private func handleOutcome(_ outcome: MotionOutcome) {
+        guard !uiLocked else {
+            return
+        }
+        
+        switch outcome {
+        case .soundchecking:
+            break
+        case .requestConsent:
+            showPermissionPrompt = true
+        case .openConsole:
+            navigateToWeb = true
+        case .fadedToBackstage:
+            navigateToMain = true
+        }
+    }
+    
+    private func armDeadline() {
+        deadlineTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 30_000_000_000)
+            
+            guard let self = self else { return }
+            
+            let shouldFire = self.conductor.reportBeatDropped()
+            if shouldFire {
+                self.handleOutcome(.fadedToBackstage)
+            }
+        }
+    }
+}

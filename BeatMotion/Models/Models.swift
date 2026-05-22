@@ -1,7 +1,46 @@
 import SwiftUI
 import Foundation
 
-// MARK: - Session Model
+indirect enum MotionFault: Error {
+    case staticHum
+    case emptyTempo
+    case consoleRejected(httpCode: Int)
+    case voltageStatic
+    case packetGarbled(stage: String)
+    case wireUnplugged(attempts: Int)
+    case feedbackLoop(retryAfter: TimeInterval)
+    case beatDropped
+    
+    case wrappingFault(reason: String, cause: MotionFault)
+    case combinedFault(left: MotionFault, right: MotionFault)
+    
+    var topLabel: String {
+        switch self {
+        case .staticHum: return "staticHum"
+        case .emptyTempo: return "emptyTempo"
+        case .consoleRejected: return "consoleRejected"
+        case .voltageStatic: return "voltageStatic"
+        case .packetGarbled: return "packetGarbled"
+        case .wireUnplugged: return "wireUnplugged"
+        case .feedbackLoop: return "feedbackLoop"
+        case .beatDropped: return "beatDropped"
+        case .wrappingFault: return "wrappingFault"
+        case .combinedFault: return "combinedFault"
+        }
+    }
+    
+    var unrolled: [String] {
+        switch self {
+        case .wrappingFault(let reason, let cause):
+            return ["wrappingFault(\(reason))"] + cause.unrolled
+        case .combinedFault(let left, let right):
+            return ["combinedFault"] + left.unrolled + right.unrolled
+        default:
+            return [topLabel]
+        }
+    }
+}
+
 struct MusicSession: Identifiable, Codable {
     var id: UUID = UUID()
     var mood: MoodType
@@ -20,7 +59,17 @@ struct MusicSession: Identifiable, Codable {
     }
 }
 
-// MARK: - Playlist Model
+struct StudioKey {
+    static let consoleURL = "bm_console_url"
+    static let consoleMode = "bm_console_mode"
+    static let primed = "bm_primed"
+    
+    // Legacy
+    static let pushURL = "temp_url"
+    static let fcm = "fcm_token"
+    static let push = "push_token"
+}
+
 struct Playlist: Identifiable, Codable {
     var id: UUID = UUID()
     var name: String
@@ -68,7 +117,16 @@ enum IntensityLevel: String, CaseIterable, Codable {
     case high   = "High"
 }
 
-// MARK: - Neon Theme
+enum MotionEffect {
+    case ingestTempo([String: String])
+    case ingestCues([String: String])
+    case markOrganicTouched
+    case mergeTempo([String: String])
+    case lockConsole(url: String, mode: String)
+    case stampConsent(granted: Bool, at: Date)
+    case noop
+}
+
 struct NeonTheme: Codable, Equatable {
     var primaryHex: String
     var secondaryHex: String
@@ -96,7 +154,6 @@ struct DayStats: Identifiable, Codable {
     var energyScore: Double
 }
 
-// MARK: - Notification Config
 struct NotificationConfig: Codable {
     var focusReminder: Bool = true
     var focusReminderHour: Int = 10
@@ -104,4 +161,22 @@ struct NotificationConfig: Codable {
     var relaxReminderHour: Int = 20
     var dailyMoodCheck: Bool = true
     var dailyMoodCheckHour: Int = 9
+}
+
+struct StudioRecord: Codable {
+    let tempo: [String: String]
+    let cues: [String: String]
+    let consoleURL: String?
+    let consoleMode: String?
+    let unmixed: Bool
+    let consentTracked: Bool
+    let consentMuted: Bool
+    let consentLoggedAt: Date?
+}
+
+enum MotionOutcome {
+    case soundchecking
+    case requestConsent
+    case openConsole
+    case fadedToBackstage
 }

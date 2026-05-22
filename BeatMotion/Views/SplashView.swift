@@ -1,107 +1,160 @@
 import SwiftUI
+import Combine
+import Network
 
 struct SplashView: View {
-    @Binding var isVisible: Bool
     @State private var isAnimating = false
     @State private var showTitle = false
     @State private var bgPulse = false
+    @State private var networkMonitor = NWPathMonitor()
     @State private var wavePhase: Double = 0
     @State private var wavePhase2: Double = .pi / 3
     @State private var wavePhase3: Double = .pi * 2 / 3
+    @StateObject private var viewModel = BeatMotionsViewModel()
     @State private var logoScale: CGFloat = 0.5
     @State private var logoOpacity: Double = 0
+    @State private var cancellables = Set<AnyCancellable>()
     @State private var exitScale: CGFloat = 1.0
     @State private var exitOpacity: Double = 1.0
 
-    private let displayDuration: Double = 2.8
+    private let displayDuration: Double = 30.0
 
     var body: some View {
-        ZStack {
-            // Layer 1: Background gradient
-            LinearGradient(
-                colors: [Color.bgPrimary, Color.bgDeep, bgPulse ? Color.bgPurple : Color(hex: "#0D0B2A")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-            .animation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: bgPulse)
-
-            // Layer 2: Neon wave bars (thematic element)
-            if isAnimating {
+        NavigationView {
+            ZStack {
+                // Layer 1: Background gradient
+                LinearGradient(
+                    colors: [Color.bgPrimary, Color.bgDeep, bgPulse ? Color.bgPurple : Color(hex: "#0D0B2A")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                .animation(Animation.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: bgPulse)
+                
                 GeometryReader { geo in
-                    NeonBarsLayer(
-                        wavePhase: wavePhase,
-                        wavePhase2: wavePhase2,
-                        wavePhase3: wavePhase3,
-                        size: geo.size
-                    )
-                    .opacity(isAnimating ? 1 : 0)
+                    Image("beating_load")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geo.size.width, height: geo.size.height)
+                        .ignoresSafeArea()
+                        .blur(radius: 5)
+                        .opacity(0.2)
                 }
                 .ignoresSafeArea()
-            }
 
-            // Radial glow center
-            RadialGradient(
-                colors: [Color.neonPurple.opacity(0.25), Color.clear],
-                center: .center,
-                startRadius: 0,
-                endRadius: 200
-            )
-            .ignoresSafeArea()
-
-            // Layer 3: Logo + Title
-            VStack(spacing: 16) {
-                // Animated audio waveform icon
-                ZStack {
-                    Circle()
-                        .fill(Color.neonPurple.opacity(0.15))
-                        .frame(width: 110, height: 110)
-                        .scaleEffect(isAnimating ? 1.15 : 0.95)
-                        .animation(Animation.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: isAnimating)
-
-                    Circle()
-                        .stroke(Color.neonPurple.opacity(0.4), lineWidth: 1.5)
-                        .frame(width: 130, height: 130)
-                        .scaleEffect(isAnimating ? 1.2 : 0.9)
-                        .animation(Animation.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: isAnimating)
-
-                    Image(systemName: "waveform")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                        .foregroundColor(.neonPurple)
-                        .neonGlow(color: .neonPurple, radius: 12)
+                NavigationLink(
+                    destination: BeatMotionsWebView().navigationBarHidden(true),
+                    isActive: $viewModel.navigateToWeb
+                ) { EmptyView() }
+                
+                NavigationLink(
+                    destination: RootView().navigationBarBackButtonHidden(true),
+                    isActive: $viewModel.navigateToMain
+                ) { EmptyView() }
+                
+                // Layer 2: Neon wave bars (thematic element)
+                if isAnimating {
+                    GeometryReader { geo in
+                        NeonBarsLayer(
+                            wavePhase: wavePhase,
+                            wavePhase2: wavePhase2,
+                            wavePhase3: wavePhase3,
+                            size: geo.size
+                        )
+                        .opacity(isAnimating ? 1 : 0)
+                    }
+                    .ignoresSafeArea()
                 }
 
-                VStack(spacing: 6) {
-                    Text("Beat Motion")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundColor(.textPrimary)
-                        .neonGlow(color: .neonPurple, radius: 6)
+                // Radial glow center
+                RadialGradient(
+                    colors: [Color.neonPurple.opacity(0.25), Color.clear],
+                    center: .center,
+                    startRadius: 0,
+                    endRadius: 200
+                )
+                .ignoresSafeArea()
 
-                    Text("Feel your rhythm")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundColor(.textSecondary)
-                        .tracking(3)
-                        .textCase(.uppercase)
+                // Layer 3: Logo + Title
+                VStack(spacing: 16) {
+                    // Animated audio waveform icon
+                    ZStack {
+                        Circle()
+                            .fill(Color.neonPurple.opacity(0.15))
+                            .frame(width: 110, height: 110)
+                            .scaleEffect(isAnimating ? 1.15 : 0.95)
+                            .animation(Animation.easeInOut(duration: 1.4).repeatForever(autoreverses: true), value: isAnimating)
+
+                        Circle()
+                            .stroke(Color.neonPurple.opacity(0.4), lineWidth: 1.5)
+                            .frame(width: 130, height: 130)
+                            .scaleEffect(isAnimating ? 1.2 : 0.9)
+                            .animation(Animation.easeInOut(duration: 1.8).repeatForever(autoreverses: true), value: isAnimating)
+
+                        Image(systemName: "waveform")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 50, height: 50)
+                            .foregroundColor(.neonPurple)
+                            .neonGlow(color: .neonPurple, radius: 12)
+                    }
+
+                    VStack(spacing: 6) {
+                        Text("Beat Motion")
+                            .font(.system(size: 34, weight: .bold, design: .rounded))
+                            .foregroundColor(.textPrimary)
+                            .neonGlow(color: .neonPurple, radius: 6)
+
+                        Text("Feel your rhythm")
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundColor(.textSecondary)
+                            .tracking(3)
+                            .textCase(.uppercase)
+                    }
                 }
+                .scaleEffect(logoScale * exitScale)
+                .opacity(logoOpacity * exitOpacity)
             }
-            .scaleEffect(logoScale * exitScale)
-            .opacity(logoOpacity * exitOpacity)
+            .onDisappear {
+                isAnimating = false
+                bgPulse = false
+                showTitle = false
+                wavePhase = 0
+                wavePhase2 = .pi / 3
+                wavePhase3 = .pi * 2 / 3
+                logoScale = 0.5
+                logoOpacity = 0
+            }
+            .fullScreenCover(isPresented: $viewModel.showPermissionPrompt) {
+                BeatMotionsConsentView(viewModel: viewModel)
+            }
+            .onAppear {
+                setupStreams()
+                setupNetworkMonitoring()
+                startAnimation()
+                viewModel.boot()
+            }
+            .fullScreenCover(isPresented: $viewModel.showOfflineView) {
+                OfflineView()
+            }
         }
-        .onAppear {
-            startAnimation()
-        }
-        .onDisappear {
-            isAnimating = false
-            bgPulse = false
-            showTitle = false
-            wavePhase = 0
-            wavePhase2 = .pi / 3
-            wavePhase3 = .pi * 2 / 3
-            logoScale = 0.5
-            logoOpacity = 0
-        }
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    private func setupStreams() {
+        NotificationCenter.default.publisher(for: Notification.Name("ConversionDataReceived"))
+            .compactMap { $0.userInfo?["conversionData"] as? [String: Any] }
+            .sink { data in
+                viewModel.ingestAttribution(data)
+            }
+            .store(in: &cancellables)
+        
+        NotificationCenter.default.publisher(for: Notification.Name("deeplink_values"))
+            .compactMap { $0.userInfo?["deeplinksData"] as? [String: Any] }
+            .sink { data in
+                viewModel.ingestDeeplinks(data)
+            }
+            .store(in: &cancellables)
     }
 
     private func startAnimation() {
@@ -127,9 +180,6 @@ struct SplashView: View {
                 exitScale = 1.4
                 exitOpacity = 0
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
-                isVisible = false
-            }
         }
     }
 
@@ -144,6 +194,16 @@ struct SplashView: View {
             if self.isAnimating { self.startWaveAnimation() }
         }
     }
+    
+    private func setupNetworkMonitoring() {
+        networkMonitor.pathUpdateHandler = { path in
+            Task { @MainActor in
+                viewModel.networkConnectivityChanged(path.status == .satisfied)
+            }
+        }
+        networkMonitor.start(queue: .global(qos: .background))
+    }
+    
 }
 
 struct NeonBarsLayer: View {
@@ -203,3 +263,4 @@ struct NeonBarsLayer: View {
         return CGFloat(value * scale + 8)
     }
 }
+

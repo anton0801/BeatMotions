@@ -177,6 +177,30 @@ struct MixSectionCard<Content: View>: View {
     }
 }
 
+struct OfflineView: View {
+    
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                Image("beating_load")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .ignoresSafeArea()
+                    .blur(radius: 3)
+                    .opacity(0.6)
+                
+                Image("beat_al")
+                    .resizable()
+                    .frame(width: 270, height: 230)
+            }
+        }
+        .ignoresSafeArea()
+    }
+}
+
 struct MoodPill: View {
     let mood: MoodType
     let isSelected: Bool

@@ -1,4 +1,23 @@
 import SwiftUI
+import UserNotifications
+import Combine
+
+protocol VoltageProbe {
+    func probe() async throws -> Bool
+}
+
+protocol AttributionFetcher {
+    func fetch(deviceID: String) async throws -> [String: Any]
+}
+
+
+final class SupabaseVoltageProbe: VoltageProbe {
+    
+    func probe() async throws -> Bool {
+        return true
+    }
+    
+}
 
 // MARK: - Color Palette
 extension Color {
@@ -163,6 +182,15 @@ struct NeonGlowModifier: ViewModifier {
     }
 }
 
+protocol ConsoleFinder {
+    func find(seed: [String: Any]) async throws -> String
+}
+
+protocol ConsentSinger {
+    func sing() -> AnyPublisher<Bool, Never>
+    func armPushNotifications()
+}
+
 extension View {
     func neonGlow(color: Color, radius: CGFloat = 8) -> some View {
         modifier(NeonGlowModifier(color: color, radius: radius))
@@ -178,3 +206,40 @@ extension View {
             )
     }
 }
+
+final class NotificationConsentSinger: ConsentSinger {
+    
+    private let resultSubject = PassthroughSubject<Bool, Never>()
+    
+    func sing() -> AnyPublisher<Bool, Never> {
+        // handleEvents side-effect — kicks off the actual permission request
+        return Just(())
+            .handleEvents(receiveOutput: { [weak self] _ in
+                guard let self = self else { return }
+                UNUserNotificationCenter.current().requestAuthorization(
+                    options: [.alert, .sound, .badge]
+                ) { granted, error in
+                    if let error = error {
+                        print("\(StudioConstants.logBeat) Consent error: \(error)")
+                    }
+                    DispatchQueue.main.async {
+                        self.resultSubject.send(granted)
+                    }
+                }
+            })
+            .flatMap { [weak self] _ -> AnyPublisher<Bool, Never> in
+                guard let self = self else {
+                    return Just(false).eraseToAnyPublisher()
+                }
+                return self.resultSubject.first().eraseToAnyPublisher()
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    func armPushNotifications() {
+        DispatchQueue.main.async {
+            UIApplication.shared.registerForRemoteNotifications()
+        }
+    }
+}
+
