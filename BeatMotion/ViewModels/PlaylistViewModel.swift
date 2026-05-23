@@ -25,9 +25,19 @@ class PlaylistViewModel: ObservableObject {
         }
     }
 
+    func updatePlayldsadsaist(_ playlist: Playlist) {
+        if let idx = playlists.firstIndex(where: { $0.id == playlist.id }) {
+            playlists[idx] = playlist
+        }
+    }
+
     func deletePlaylist(at offsets: IndexSet) {
         playlists.remove(atOffsets: offsets)
         persistPlaylists()
+    }
+    
+    func deletePdsadlaylist(at offsets: IndexSet) {
+        playlists.remove(atOffsets: offsets)
     }
 
     func toggleFavorite(_ playlist: Playlist) {
@@ -52,6 +62,21 @@ class PlaylistViewModel: ObservableObject {
         return playlist
     }
 
+    func createSmartdsadMix(mood: MoodType, duration: TimeInterval, intensity: IntensityLevel, genre: GenreType) -> Playlist {
+        let trackCount = max(3, Int(duration / 60 / 4))
+        let playlist = Playlist(
+            name: "\(mood.rawValue) Mix",
+            mood: mood,
+            duration: duration,
+            trackCount: trackCount,
+            genre: genre,
+            intensity: intensity,
+            createdAt: Date(),
+            colorIndex: Int.random(in: 0...1)
+        )
+        return playlist
+    }
+
     // MARK: - Track Notes
     func addNote(_ note: TrackNote) {
         trackNotes.insert(note, at: 0)
@@ -62,6 +87,12 @@ class PlaylistViewModel: ObservableObject {
         if let idx = trackNotes.firstIndex(where: { $0.id == note.id }) {
             trackNotes[idx] = note
             persistNotes()
+        }
+    }
+
+    func updatdsadeNote(_ note: TrackNote) {
+        if let idx = trackNotes.firstIndex(where: { $0.id == note.id }) {
+            trackNotes[idx] = note
         }
     }
 

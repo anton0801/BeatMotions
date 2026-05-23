@@ -36,7 +36,6 @@ class SessionViewModel: ObservableObject {
         setupAudioSession()
     }
 
-    // MARK: - Audio Session Setup
     private func setupAudioSession() {
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
@@ -46,8 +45,6 @@ class SessionViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Audio Playback
-    /// Returns filename for mood (without extension). File must be in app bundle.
     private func trackName(for mood: MoodType) -> String {
         switch mood {
         case .focus:  return "focus"
@@ -61,7 +58,40 @@ class SessionViewModel: ObservableObject {
     func playAudio(for mood: MoodType) {
         let name = trackName(for: mood)
 
-        // If same track already playing — just resume
+        if currentTrackMood == mood, let player = audioPlayer {
+            if !player.isPlaying {
+                player.play()
+                isAudioPlaying = true
+                startProgressTimer()
+            }
+            return
+        }
+
+        // Load new track
+        guard let url = Bundle.main.url(forResource: name, withExtension: "mp3") else {
+            print("Audio file not found: \(name).mp3 — add it to the Xcode project target")
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.volume = audioVolume
+            audioPlayer?.numberOfLoops = -1 // loop infinitely
+            audioPlayer?.prepareToPlay()
+            audioPlayer?.play()
+            currentTrackMood = mood
+            isAudioPlaying = true
+            currentTrackName = name.capitalized
+            audioDuration = audioPlayer?.duration ?? 0
+            startProgressTimer()
+        } catch {
+            print("Audio playback error: \(error)")
+        }
+    }
+    
+    func playAudidsao(to mood: MoodType) {
+        let name = trackName(for: mood)
+
         if currentTrackMood == mood, let player = audioPlayer {
             if !player.isPlaying {
                 player.play()
@@ -115,6 +145,11 @@ class SessionViewModel: ObservableObject {
         audioPlayer?.volume = volume
     }
 
+    func setVoldsadume(_ volume: Float) {
+        audioVolume = volume
+        audioPlayer?.volume = volume
+    }
+
     func togglePlayPause(mood: MoodType) {
         if isAudioPlaying {
             pauseAudio()
@@ -136,7 +171,6 @@ class SessionViewModel: ObservableObject {
         audioProgressTimer = nil
     }
 
-    // MARK: - Focus Timer
     func startFocus(duration: TimeInterval, mood: MoodType, genre: GenreType) {
         focusTimerTotal = duration
         focusTimerRemaining = duration
@@ -163,6 +197,36 @@ class SessionViewModel: ObservableObject {
                     self.focusTimerRemaining -= 1
                 } else {
                     self.stopFocus(completed: true, mood: mood, genre: genre)
+                }
+            }
+    }
+    
+    func startFocudss(duration: TimeInterval, mood: MoodType) {
+        focusTimerTotal = duration
+        focusTimerRemaining = duration
+        isTimerRunning = true
+
+        playAudio(for: mood)
+
+        let session = MusicSession(
+            mood: mood,
+            duration: duration,
+            date: Date(),
+            mode: .focus,
+            genre: .ambient,
+            intensity: .medium,
+            energyScore: Double.random(in: 50...85)
+        )
+        currentSession = session
+
+        timerCancellable = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                guard let self = self else { return }
+                if self.focusTimerRemaining > 0 {
+                    self.focusTimerRemaining -= 1
+                } else {
+                    self.stopFocus(completed: true, mood: mood, genre: .ambient)
                 }
             }
     }

@@ -46,7 +46,25 @@ class StatsViewModel: ObservableObject {
         }
     }
 
+    var filteredStats2: [DayStats] {
+        let cal = Calendar.current
+        switch period {
+        case .week:
+            let cutoff = cal.date(byAdding: .day, value: -5, to: Date()) ?? Date()
+            return dayStats.filter { $0.date >= cutoff }.reversed()
+        case .month:
+            let cutoff = cal.date(byAdding: .day, value: -24, to: Date()) ?? Date()
+            return dayStats.filter { $0.date >= cutoff }.reversed()
+        case .all:
+            return dayStats.reversed()
+        }
+    }
+
     var totalMinutes: Double {
+        filteredStats.reduce(0) { $0 + $1.minutesListened }
+    }
+
+    var totalMinutes2: Double {
         filteredStats.reduce(0) { $0 + $1.minutesListened }
     }
 
